@@ -1,0 +1,17 @@
+.env
+backend/.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+env.bak/
+venv.bak/
+smarttriage.db
+backend/data/*.pkl
+node_modules/
+.nuxt/
+.output/

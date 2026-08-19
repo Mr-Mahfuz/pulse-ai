@@ -1,0 +1,162 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-esi-1: 220, 38, 38;
+    --color-esi-2: 234, 88, 12;
+    --color-esi-3: 202, 138, 4;
+    --color-esi-4: 22, 163, 74;
+    --color-esi-5: 37, 99, 235;
+
+    --color-primary: 37, 99, 235;
+    --color-primary-hover: 29, 78, 216;
+  }
+
+  .dark {
+    --color-esi-1: 248, 113, 113;
+    --color-esi-2: 251, 146, 60;
+    --color-esi-3: 250, 204, 21;
+    --color-esi-4: 74, 222, 128;
+    --color-esi-5: 96, 165, 250;
+
+    --color-primary: 96, 165, 250;
+    --color-primary-hover: 59, 130, 246;
+  }
+
+  html {
+    @apply antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  
+  body {
+    @apply min-h-screen overflow-x-hidden bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+  }
+}
+
+@layer components {
+  /* ─── Cards ─── */
+  .card {
+    @apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm;
+  }
+  .card-header {
+    @apply px-6 py-4 border-b border-gray-100 dark:border-gray-800;
+  }
+  .card-body {
+    @apply p-6;
+  }
+  .card-title {
+    @apply text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-wide;
+  }
+
+  /* ─── Buttons ─── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg text-sm font-semibold transition-all duration-150 
+           disabled:pointer-events-none disabled:opacity-40 cursor-pointer select-none;
+  }
+  .btn-primary {
+    @apply btn px-5 py-2.5 bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-sm 
+           dark:bg-blue-500 dark:hover:bg-blue-600;
+  }
+  .btn-secondary {
+    @apply btn px-5 py-2.5 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 
+           border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 shadow-sm;
+  }
+  .btn-ghost {
+    @apply btn px-3 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 
+           hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg;
+  }
+  .btn-danger {
+    @apply btn px-5 py-2.5 bg-red-600 text-white hover:bg-red-700 shadow-sm;
+  }
+
+  /* ─── Form Elements ─── */
+  .form-label {
+    @apply block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5;
+  }
+  .form-input {
+    @apply w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 
+           px-3.5 py-2.5 text-sm text-gray-900 dark:text-gray-100
+           placeholder:text-gray-400 dark:placeholder:text-gray-500
+           focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
+           dark:focus:ring-blue-400/20 dark:focus:border-blue-400
+           transition-colors;
+  }
+
+  /* ─── Data Table ─── */
+  .data-table {
+    @apply w-full text-left text-sm;
+  }
+  .data-table thead th {
+    @apply px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider 
+           border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50;
+  }
+  .data-table tbody td {
+    @apply px-5 py-4 border-b border-gray-50 dark:border-gray-800/50 text-gray-700 dark:text-gray-300;
+  }
+  .data-table tbody tr {
+    @apply transition-colors hover:bg-blue-50/40 dark:hover:bg-blue-950/20 cursor-pointer;
+  }
+  .data-table tbody tr:last-child td {
+    @apply border-0;
+  }
+
+  /* ─── ESI Badge ─── */
+  .esi-badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold tracking-wide;
+  }
+
+  /* ─── Stat Card ─── */
+  .stat-card {
+    @apply card p-5 flex flex-col gap-1;
+  }
+  .stat-label {
+    @apply text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider;
+  }
+  .stat-value {
+    @apply text-3xl font-bold font-mono tabular-nums tracking-tight;
+  }
+
+  /* ─── Section Heading ─── */
+  .section-label {
+    @apply text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest;
+  }
+}
+
+@layer utilities {
+  /* Animations */
+  .animate-fade-in {
+    animation: fadeIn 0.2s ease-out;
+  }
+  .animate-slide-up {
+    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .animate-pulse-border {
+    animation: pulseBorder 2s ease-in-out infinite;
+  }
+  @keyframes pulseBorder {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(var(--color-esi-1), 0); }
+    50% { box-shadow: 0 0 0 4px rgba(var(--color-esi-1), 0.15); }
+  }
+
+  /* Print */
+  @media print {
+    aside, header, button, .no-print { display: none !important; }
+    .pl-64 { padding-left: 0 !important; }
+    main { padding: 0 !important; max-width: 100% !important; }
+    body, html { background: white !important; color: black !important; }
+    .card { box-shadow: none !important; border: 1px solid #e5e7eb !important; break-inside: avoid; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    @page { size: A4 portrait; margin: 1.5cm; }
+  }
+}
