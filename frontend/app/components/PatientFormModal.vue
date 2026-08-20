@@ -151,7 +151,7 @@ const vitalConfig = {
 const form = ref({
   name: '', age: null, gender: '', chief_complaint: '',
   heart_rate: null, systolic_bp: null, diastolic_bp: null,
-  respiratory_rate: null, temperature: null, spo2: null, gcs_score: 15,
+  respiratory_rate: null, temperature: null, spo2: null, gcs_score: null,
   weight: null, pain_scale: null,
   medical_history: ''
 })
