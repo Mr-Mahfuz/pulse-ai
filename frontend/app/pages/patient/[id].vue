@@ -192,7 +192,10 @@
               <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
               <p class="text-sm font-medium">{{ $t('patient_detail.not_triaged') }}</p>
             </div>
-            <button @click="handleRetriage" class="btn-primary print:hidden">{{ $t('patient_detail.run_ai') }}</button>
+            <button @click="handleRetriage" :disabled="triaging" class="btn-primary print:hidden">
+              <svg v-if="triaging" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+              {{ $t('patient_detail.run_ai') }}
+            </button>
           </div>
         </div>
       </div>
