@@ -90,6 +90,8 @@
 <script setup>
 import { getEffectiveLevel } from '~/utils/esi'
 
+definePageMeta({ layout: false })
+
 const { getPatients } = useApi()
 
 // ALWAYS FORCE PRIVACY MODE ON PUBLIC MONITOR
