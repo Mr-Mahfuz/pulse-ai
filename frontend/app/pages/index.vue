@@ -120,16 +120,16 @@
 
       <!-- Table -->
       <div v-if="!mciMode" class="overflow-x-auto min-h-[400px] pb-4">
-        <table class="w-full text-left border-collapse table-fixed">
+        <table class="w-full text-left border-collapse min-w-[900px]">
           <thead>
             <tr class="border-b border-gray-100 dark:border-gray-800 text-[10px] font-bold text-gray-400 dark:text-gray-500 tracking-wider uppercase">
-              <th class="px-4 py-3 font-semibold w-[13%]">{{ $t('dashboard.priority') }}</th>
-              <th class="px-4 py-3 font-semibold w-[8%]">{{ $t('dashboard.wait') }}</th>
-              <th class="px-4 py-3 font-semibold w-[8%]">{{ $t('dashboard.est_time') }}</th>
-              <th class="px-4 py-3 font-semibold w-[18%]">{{ $t('dashboard.patient') }}</th>
-              <th class="px-4 py-3 font-semibold w-[26%]">{{ $t('dashboard.complaint') }}</th>
-              <th class="px-4 py-3 font-semibold w-[15%]">{{ $t('dashboard.vitals') }}</th>
-              <th class="px-4 py-3 font-semibold text-right w-[12%]">{{ $t('dashboard.ai_conf') }}</th>
+              <th class="px-4 py-3 font-semibold w-px whitespace-nowrap">{{ $t('dashboard.priority') }}</th>
+              <th class="px-4 py-3 font-semibold w-px whitespace-nowrap">{{ $t('dashboard.wait') }}</th>
+              <th class="px-4 py-3 font-semibold w-px whitespace-nowrap">{{ $t('dashboard.est_time') }}</th>
+              <th class="px-4 py-3 font-semibold w-48">{{ $t('dashboard.patient') }}</th>
+              <th class="px-4 py-3 font-semibold w-auto">{{ $t('dashboard.complaint') }}</th>
+              <th class="px-4 py-3 font-semibold w-px whitespace-nowrap">{{ $t('dashboard.vitals') }}</th>
+              <th class="px-4 py-3 font-semibold text-right w-px whitespace-nowrap">{{ $t('dashboard.ai_conf') }}</th>
             </tr>
           </thead>
           <!-- Loading -->
@@ -150,11 +150,11 @@
                 class="border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50/50 dark:hover:bg-gray-800/40 cursor-pointer transition-all group"
                 :class="getRowClass(patient)">
               <!-- Priority Badge -->
-              <td class="px-4 py-4">
-                <div v-if="!mciMode" class="esi-badge text-xs px-2 whitespace-nowrap shadow-sm" :style="{ backgroundColor: `${getEsiLevel(getEffectiveLevel(patient)).color}15`, color: getEsiLevel(getEffectiveLevel(patient)).color, border: `1px solid ${getEsiLevel(getEffectiveLevel(patient)).color}30` }">
+              <td class="px-4 py-4 whitespace-nowrap">
+                <div v-if="!mciMode" class="esi-badge text-xs px-2 shadow-sm" :style="{ backgroundColor: `${getEsiLevel(getEffectiveLevel(patient)).color}15`, color: getEsiLevel(getEffectiveLevel(patient)).color, border: `1px solid ${getEsiLevel(getEffectiveLevel(patient)).color}30` }">
                   {{ getEsiLevel(getEffectiveLevel(patient)).icon }} ESI-{{ getEffectiveLevel(patient) }}
                 </div>
-                <div v-else class="esi-badge text-xs px-2 whitespace-nowrap font-bold text-white shadow-sm" :class="getMciColor(getEffectiveLevel(patient)).bg">
+                <div v-else class="esi-badge text-xs px-2 font-bold text-white shadow-sm" :class="getMciColor(getEffectiveLevel(patient)).bg">
                   {{ getMciColor(getEffectiveLevel(patient)).label }}
                 </div>
                 <!-- SLA Breach Flag -->
@@ -164,20 +164,20 @@
                 </div>
               </td>
               <!-- Wait -->
-              <td class="px-4 py-4">
+              <td class="px-4 py-4 whitespace-nowrap">
                 <span class="text-xs font-mono font-medium" :class="getMinutesInQueue(patient.arrival_time) > 120 ? 'text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400'">
                   {{ formatTimeAgoShort(patient.arrival_time) }}
                 </span>
               </td>
               <!-- Est Time -->
-              <td class="px-4 py-4">
+              <td class="px-4 py-4 whitespace-nowrap">
                 <span v-if="!mciMode" class="text-xs font-mono text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800">
                   {{ getEstimatedWait(patient) }}
                 </span>
                 <span v-else class="text-xs font-mono text-gray-400">—</span>
               </td>
               <!-- Patient -->
-              <td class="px-4 py-4">
+              <td class="px-4 py-4 whitespace-nowrap">
                 <div class="font-semibold text-gray-900 dark:text-white text-sm">{{ maskName(patient.name) }}</div>
                 <div class="text-xs text-gray-500 mt-0.5">{{ patient.age }}y · {{ patient.gender }}</div>
               </td>
@@ -189,8 +189,8 @@
                 </div>
               </td>
               <!-- Vitals -->
-              <td class="px-4 py-4">
-                <div class="flex gap-1.5 flex-wrap">
+              <td class="px-4 py-4 whitespace-nowrap">
+                <div class="flex gap-1.5">
                   <span v-if="patient.heart_rate" class="text-[10px] font-mono px-1.5 py-0.5 rounded"
                         :class="patient.heart_rate > 100 || patient.heart_rate < 50 ? 'bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 font-semibold' : 'text-gray-500'">
                     HR:{{ patient.heart_rate }}
@@ -210,7 +210,7 @@
                 </div>
               </td>
               <!-- Confidence -->
-              <td class="text-right px-4 py-4">
+              <td class="text-right px-4 py-4 whitespace-nowrap">
                 <div v-if="patient.triage_source === 'red_flag_override'" class="flex items-center justify-end">
                   <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider">
                     Safety Rule
