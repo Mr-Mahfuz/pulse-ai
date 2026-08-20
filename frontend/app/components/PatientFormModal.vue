@@ -53,6 +53,14 @@
       <!-- Form -->
       <form @submit.prevent="submit" class="flex-1 overflow-y-auto p-6 space-y-6">
 
+        <!-- Quick Fill Scenarios -->
+        <div class="flex flex-wrap items-center gap-2 pb-4 border-b border-gray-100 dark:border-gray-800">
+          <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2">Auto-Fill:</span>
+          <button type="button" @click="fillScenario('esi-1')" class="px-2.5 py-1 text-[10px] font-bold rounded bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800">CRITICAL (ESI-1)</button>
+          <button type="button" @click="fillScenario('esi-3')" class="px-2.5 py-1 text-[10px] font-bold rounded bg-yellow-50 text-yellow-600 hover:bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-500 border border-yellow-200 dark:border-yellow-800">URGENT (ESI-3)</button>
+          <button type="button" @click="fillScenario('esi-5')" class="px-2.5 py-1 text-[10px] font-bold rounded bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800">MINOR (ESI-5)</button>
+        </div>
+
         <!-- Demographics -->
         <div>
           <div class="section-label mb-3">{{ $t('patient_modal.demographics') }}</div>
@@ -150,6 +158,31 @@ const form = ref({
 
 const loading = ref(false)
 const iotActive = ref(false)
+
+const fillScenario = (scenario) => {
+  if (scenario === 'esi-1') {
+    form.value = {
+      name: 'Robert Downey', age: 62, gender: 'M', chief_complaint: 'Crushing chest pain radiating to the jaw, sweating, and severe shortness of breath.',
+      heart_rate: 135, systolic_bp: 85, diastolic_bp: 50, respiratory_rate: 28,
+      temperature: 36.8, spo2: 88, gcs_score: 13, weight: 88, pain_scale: 10,
+      medical_history: 'Hypertension, previous myocardial infarction in 2018.'
+    }
+  } else if (scenario === 'esi-3') {
+    form.value = {
+      name: 'Emily Blunt', age: 28, gender: 'F', chief_complaint: 'High fever for 3 days and severe right lower quadrant abdominal pain.',
+      heart_rate: 115, systolic_bp: 110, diastolic_bp: 70, respiratory_rate: 18,
+      temperature: 39.4, spo2: 97, gcs_score: 15, weight: 62, pain_scale: 8,
+      medical_history: 'None'
+    }
+  } else if (scenario === 'esi-5') {
+    form.value = {
+      name: 'Tom Holland', age: 24, gender: 'M', chief_complaint: 'Ran out of my seasonal allergy medication, need a refill prescription.',
+      heart_rate: 72, systolic_bp: 120, diastolic_bp: 80, respiratory_rate: 14,
+      temperature: 37.0, spo2: 99, gcs_score: 15, weight: 75, pain_scale: 0,
+      medical_history: 'Seasonal allergies.'
+    }
+  }
+}
 
 const simulateIoT = () => {
   if (iotActive.value) return
