@@ -59,3 +59,28 @@ The original architecture (from prior AI discussion) assumed multi-day build tim
 | 3 | Confirm Node.js 18+ installed | Medium | ⏳ Waiting |
 | 4 | Team member names for README | Low | ⏳ Later |
 | 5 | Determine if presentation slides needed | Low | ⏳ Later |
+
+---
+
+## Session Post-Audit Hardening — 2026-08-20
+
+### Tier 0 Fixes (Demo-Breaking Issues) Completed
+
+**Actions:**
+1. **GCS field mismatch**: Changed `gcs` to `gcs_score` in `PatientFormModal.vue` (`vitalConfig` and `form`) to match the backend `PatientCreate` schema, preventing GCS values from being silently dropped and ignored by the red flag layer.
+2. **`/api/triage/batch` route shadowing**: Reordered `backend/routes/triage.py` to declare `@router.post("/batch")` before `@router.post("/{patient_id}")`, fixing the 404 shadowing bug.
+3. **Gemini SDK dependency mismatch**: Updated `backend/requirements.txt` from `google-generativeai` to `google-genai` to match the actual code imports.
+4. **`speech.py` unconditional Gemini import**: Wrapped `from google import genai` in `speech.py` in a try/except block, catching `ImportError` and returning 503 if unavailable, to prevent catastrophic failure on backend startup if the SDK isn't installed.
+5. **`demo_sim.py` status code check**: Updated the HTTP check to `response.status_code in (200, 201)` because `POST /api/patients/` returns 201, fixing false-positive error logs during the demo simulation.
+
+**Status**: Tier 0 complete. Moving to Tier 1.
+
+### Tier 1 Fixes (Trust & Correctness) Completed
+
+**Actions:**
+1. **ESI color inconsistency**: Aligned `frontend/app/utils/esi.js` to match the standard colors defined in `main.css` and `phase-2-triage-engine.md` (Level 1: Red, Level 2: Orange, Level 3: Yellow, Level 4: Green, Level 5: Blue).
+2. **Misleading confidence on red-flag overrides**: Modified `frontend/app/pages/index.vue` to display a "Safety Rule" badge instead of a potentially confusing ML confidence percentage when the triage decision was forced by a deterministic red flag.
+3. **Docs vs. reality pass**: Updated `FEATURES.md`, `DOCUMENTATION.md`, `HACKATHON_PITCH.md`, and all four phase docs to accurately reflect the actual implementation: Nuxt/Vue instead of Next.js/React, SQLite instead of PostgreSQL, 10s polling instead of 3s, and explicitly documenting the rule+ML+LLM pipeline instead of Bio_ClinicalBERT.
+4. **Root `README.md` + AI disclosure**: Created a root `README.md` containing accurate setup instructions, project architecture, and a strict AI disclosure clarifying the use of synthetic training data and the limited role of the LLM.
+
+**Status**: Tier 1 complete. Moving to Tier 2.

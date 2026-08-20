@@ -33,6 +33,8 @@ class PatientDB(Base):
     temperature = Column(Float)
     spo2 = Column(Integer)
     gcs_score = Column(Integer, default=15)
+    weight = Column(Float, nullable=True)
+    pain_scale = Column(Integer, nullable=True)
     
     medical_history = Column(Text, default="")
     arrival_time = Column(DateTime, default=datetime.utcnow)

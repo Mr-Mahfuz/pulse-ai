@@ -44,6 +44,10 @@ export const useApi = () => {
     method: 'DELETE',
   })
 
+  const updatePatientStatus = (id, status) => fetchApi(`/api/patients/${id}/status?status=${status}`, {
+    method: 'PATCH',
+  })
+
   // Triage endpoints
   const runTriage = (patientId) => {
     const nuxtApp = useNuxtApp()
@@ -58,6 +62,11 @@ export const useApi = () => {
   const overrideTriage = (patientId, level, reason) => fetchApi(`/api/triage/${patientId}/override`, {
     method: 'PUT',
     body: { level, reason },
+  })
+
+  const translateRationale = (patientId, language) => fetchApi(`/api/triage/${patientId}/translate`, {
+    method: 'POST',
+    body: { language }
   })
 
   // Audit endpoints
@@ -75,10 +84,12 @@ export const useApi = () => {
     getPatient,
     createPatient,
     updatePatient,
+    updatePatientStatus,
     deletePatient,
     runTriage,
     batchTriage,
     overrideTriage,
+    translateRationale,
     getAuditLog,
     getAllAuditLogs,
     parseSpeech,

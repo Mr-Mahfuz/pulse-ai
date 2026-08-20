@@ -16,11 +16,14 @@
           <button type="button" @click="toggleDictation" 
                   class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all border"
                   :class="isListening 
-                    ? 'bg-red-50 text-red-600 border-red-200 animate-pulse' 
+                    ? 'bg-red-50 text-red-600 border-red-200 shadow-[0_0_15px_rgba(220,38,38,0.5)] animate-pulse' 
                     : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-750'">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-            </svg>
+            <div class="relative">
+              <svg class="w-4 h-4 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
+              <span v-if="isListening" class="absolute inset-0 rounded-full bg-red-400 opacity-75 animate-ping"></span>
+            </div>
             {{ isListening ? $t('patient_modal.listening') : (dictating ? $t('patient_modal.processing') : $t('patient_modal.dictate')) }}
           </button>
           
@@ -32,9 +35,19 @@
         </div>
       </div>
 
-      <!-- Transcript preview (only visible if there is one) -->
-      <div v-if="transcript" class="px-6 py-3 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-800/30 text-sm text-blue-800 dark:text-blue-300 font-medium italic">
-        "{{ transcript }}"
+      <!-- Transcript preview -->
+      <div v-if="isListening || transcript" class="px-6 py-4 bg-blue-50/80 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-800/30">
+        <div class="flex items-center gap-2 mb-1">
+          <div v-if="isListening" class="flex gap-1">
+            <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+            <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+            <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+          </div>
+          <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">AI Voice Parser Active</span>
+        </div>
+        <p class="text-sm text-blue-800 dark:text-blue-300 font-medium italic min-h-[20px]">
+          "{{ transcript }}<span v-if="isListening" class="animate-pulse">_</span>"
+        </p>
       </div>
 
       <!-- Form -->
@@ -78,7 +91,7 @@
             <div v-for="(config, key) in vitalConfig" :key="key">
               <label class="form-label !text-xs">{{ config.label }}</label>
               <div class="relative">
-                <input v-model.number="form[key]" type="number" :step="key === 'temperature' ? 0.1 : 1" class="form-input font-mono pr-10 !py-2" placeholder="—" />
+                <input v-model.number="form[key]" type="number" :step="['temperature', 'weight'].includes(key) ? 0.1 : 1" class="form-input font-mono pr-10 !py-2" placeholder="—" />
                 <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-mono">{{ config.unit }}</span>
               </div>
             </div>
@@ -115,13 +128,16 @@ const vitalConfig = {
   respiratory_rate: { label: 'Resp. Rate', unit: '/min' },
   temperature: { label: 'Temperature', unit: '°C' },
   spo2: { label: 'SpO₂', unit: '%' },
-  gcs: { label: 'GCS Score', unit: '/15' },
+  gcs_score: { label: 'GCS Score', unit: '/15' },
+  weight: { label: 'Weight', unit: 'kg' },
+  pain_scale: { label: 'Pain Scale', unit: '/10' }
 }
 
 const form = ref({
   name: '', age: null, gender: '', chief_complaint: '',
   heart_rate: null, systolic_bp: null, diastolic_bp: null,
-  respiratory_rate: null, temperature: null, spo2: null, gcs: 15,
+  respiratory_rate: null, temperature: null, spo2: null, gcs_score: 15,
+  weight: null, pain_scale: null,
   medical_history: ''
 })
 

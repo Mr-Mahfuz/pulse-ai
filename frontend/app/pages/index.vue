@@ -1,5 +1,23 @@
 <template>
   <div class="space-y-6">
+    <!-- Critical Alert Banner -->
+    <div v-if="criticalAlertPatient" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-3xl px-4 animate-slide-down">
+      <div class="bg-red-600 text-white rounded-2xl shadow-[0_0_40px_rgba(220,38,38,0.6)] border-2 border-red-400 p-4 flex items-center justify-between cursor-pointer hover:bg-red-700 transition-colors" @click="navigateTo(`/patient/${criticalAlertPatient.id}`)">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+            <span class="text-2xl animate-bounce">🚨</span>
+          </div>
+          <div>
+            <h3 class="font-black text-lg uppercase tracking-wider animate-pulse">Critical Patient Arrived (ESI-1)</h3>
+            <p class="text-red-100 text-sm font-medium">{{ criticalAlertPatient.name }} • {{ criticalAlertPatient.age }}y • {{ criticalAlertPatient.chief_complaint }}</p>
+          </div>
+        </div>
+        <div class="bg-white text-red-700 font-bold px-4 py-2 rounded-lg text-sm shrink-0 shadow-sm">
+          Triage Now
+        </div>
+      </div>
+    </div>
+
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
@@ -31,7 +49,7 @@
     <div v-if="!mciMode" class="grid grid-cols-2 md:grid-cols-6 gap-3">
       <div class="stat-card !bg-gray-900 !border-gray-800 flex flex-col justify-center shadow-lg backdrop-blur-xl bg-opacity-80">
         <span class="text-[10px] font-bold text-gray-400 tracking-wider mb-1">{{ $t('dashboard.in_queue') }}</span>
-        <span class="text-3xl font-bold text-white">{{ patients.length }}</span>
+        <span class="text-3xl font-bold text-white">{{ activePatients.length }}</span>
       </div>
       <div v-for="level in [1,2,3,4,5]" :key="level" class="stat-card relative overflow-hidden backdrop-blur-lg bg-white/70 dark:bg-gray-900/70 border border-white/20 dark:border-gray-800/50 shadow-sm">
         <div class="absolute top-0 left-0 w-full h-1.5" :style="{ backgroundColor: getEsiLevel(level).color }"></div>
@@ -73,6 +91,11 @@
         {{ $t('dashboard.fast_track') }}
         <span class="px-2 py-0.5 rounded-full text-xs" :class="activeTab === 'fast' ? 'bg-green-100 text-green-700 dark:bg-green-900/30' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'">{{ fastQueueCount }}</span>
       </button>
+      <button @click="activeTab = 'history'" 
+              class="px-4 py-3 text-sm font-bold border-b-2 transition-colors flex items-center gap-2 ml-auto"
+              :class="activeTab === 'history' ? 'border-gray-500 text-gray-700 dark:text-gray-300' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'">
+        History (Cleared)
+      </button>
     </div>
 
     <!-- Patient Table -->
@@ -88,7 +111,7 @@
       </div>
 
       <!-- Table -->
-      <div class="overflow-x-auto min-h-[400px]">
+      <div v-if="!mciMode" class="overflow-x-auto min-h-[400px]">
         <table class="w-full text-left border-collapse min-w-[900px]">
           <thead>
             <tr class="border-b border-gray-100 dark:border-gray-800 text-[10px] font-bold text-gray-400 dark:text-gray-500 tracking-wider uppercase">
@@ -180,7 +203,12 @@
               </td>
               <!-- Confidence -->
               <td class="text-right">
-                <div v-if="patient.triage_confidence" class="flex items-center justify-end gap-2.5">
+                <div v-if="patient.triage_source === 'red_flag_override'" class="flex items-center justify-end">
+                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider">
+                    Safety Rule
+                  </span>
+                </div>
+                <div v-else-if="patient.triage_confidence" class="flex items-center justify-end gap-2.5">
                   <div class="w-14 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                     <div class="h-full rounded-full transition-all duration-500"
                          :class="patient.triage_confidence >= 0.8 ? 'bg-emerald-500' : patient.triage_confidence >= 0.6 ? 'bg-amber-500' : 'bg-red-500'"
@@ -195,6 +223,29 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- MCI Card Grid -->
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 min-h-[400px]">
+        <div v-for="patient in displayPatients" :key="patient.id" class="rounded-2xl border-4 overflow-hidden flex flex-col shadow-xl transition-transform hover:scale-[1.02] cursor-pointer"
+             :class="getMciColor(getEffectiveLevel(patient)).cardBorder"
+             @click="navigateTo(`/patient/${patient.id}`)">
+          <div class="p-4 text-center font-black tracking-widest text-xl text-white" :class="getMciColor(getEffectiveLevel(patient)).bg">
+            {{ getMciColor(getEffectiveLevel(patient)).label }}
+          </div>
+          <div class="p-6 bg-white dark:bg-gray-900 flex-1 flex flex-col">
+            <h3 class="font-bold text-2xl mb-1 text-gray-900 dark:text-white">{{ patient.name }}</h3>
+            <div class="text-sm text-gray-500 mb-4">{{ patient.age }}y • {{ patient.gender }}</div>
+            <p class="text-gray-700 dark:text-gray-300 font-medium mb-6 line-clamp-3 flex-1">
+              "{{ patient.chief_complaint }}"
+            </p>
+            <button class="w-full py-3 rounded-xl font-bold text-lg uppercase tracking-wider transition-colors"
+                    :class="getMciColor(getEffectiveLevel(patient)).btnClass"
+                    @click.stop="navigateTo(`/patient/${patient.id}`)">
+              View & Admit
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -215,10 +266,14 @@ const searchQuery = ref('')
 const mciMode = ref(false)
 const activeTab = ref('main') // 'main' or 'fast'
 let refreshInterval = null
+const previousEsi1Ids = ref(new Set())
+const criticalAlertPatient = ref(null)
+
+const activePatients = computed(() => patients.value.filter(p => p.status === 'waiting'))
 
 const esiCounts = computed(() => {
   const counts = {}
-  for (const p of patients.value) {
+  for (const p of activePatients.value) {
     const level = getEffectiveLevel(p)
     if (level) counts[level] = (counts[level] || 0) + 1
   }
@@ -229,9 +284,9 @@ const getCountByLevel = (level) => esiCounts.value[level] || 0
 
 // MCI Logic
 const getMciColor = (level) => {
-  if (level <= 1) return { bg: 'bg-red-600', label: 'IMMEDIATE' }
-  if (level <= 3) return { bg: 'bg-yellow-500 text-yellow-950', label: 'DELAYED' }
-  return { bg: 'bg-green-500 text-green-950', label: 'MINOR' }
+  if (level <= 1) return { bg: 'bg-red-600', label: 'IMMEDIATE', cardBorder: 'border-red-600', btnClass: 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50' }
+  if (level <= 3) return { bg: 'bg-yellow-500 text-yellow-950', label: 'DELAYED', cardBorder: 'border-yellow-500', btnClass: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-500 dark:hover:bg-yellow-900/50' }
+  return { bg: 'bg-green-500 text-green-950', label: 'MINOR', cardBorder: 'border-green-500', btnClass: 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-500 dark:hover:bg-green-900/50' }
 }
 const getMciCount = (cat) => {
   if (cat === 'IMMEDIATE') return getCountByLevel(1)
@@ -255,6 +310,7 @@ const formatTimeAgoShort = (timestamp) => {
 
 // SLA & Re-Triage Rules
 const isSlaBreached = (patient) => {
+  if (patient.status === 'discharged') return false
   const level = getEffectiveLevel(patient)
   const minutes = getMinutesInQueue(patient.arrival_time)
   if (level === 2 && minutes > 15) return true
@@ -265,6 +321,7 @@ const isSlaBreached = (patient) => {
 }
 
 const needsReTriage = (patient) => {
+  if (patient.status === 'discharged') return false
   const level = getEffectiveLevel(patient)
   const minutes = getMinutesInQueue(patient.arrival_time)
   // Alert if ESI 4/5 waits > 120 mins (to prevent orphaned queue deterioration)
@@ -280,7 +337,10 @@ const getRowClass = (patient) => {
 
 // Queue Processing & Estimates
 const filteredPatients = computed(() => {
-  let list = patients.value
+  let list = activeTab.value === 'history' 
+    ? patients.value.filter(p => p.status === 'discharged')
+    : activePatients.value
+
   if (searchQuery.value.trim()) {
     const q = searchQuery.value.toLowerCase()
     list = list.filter(p => p.name?.toLowerCase().includes(q) || p.chief_complaint?.toLowerCase().includes(q))
@@ -304,11 +364,12 @@ const sortedPatients = computed(() => {
 })
 
 // Tab logic
-const mainQueueCount = computed(() => sortedPatients.value.filter(p => getEffectiveLevel(p) <= 3).length)
-const fastQueueCount = computed(() => sortedPatients.value.filter(p => getEffectiveLevel(p) > 3).length)
+const mainQueueCount = computed(() => activePatients.value.filter(p => getEffectiveLevel(p) <= 3).length)
+const fastQueueCount = computed(() => activePatients.value.filter(p => getEffectiveLevel(p) > 3).length)
 
 const displayPatients = computed(() => {
   if (mciMode.value) return sortedPatients.value // In MCI, see all
+  if (activeTab.value === 'history') return sortedPatients.value
   return sortedPatients.value.filter(p => {
     const level = getEffectiveLevel(p)
     if (activeTab.value === 'main') return level <= 3
@@ -333,7 +394,26 @@ const getEstimatedWait = (patient) => {
 
 const fetchPatients = async () => {
   try {
-    patients.value = await getPatients()
+    const data = await getPatients()
+    
+    // Check for new ESI-1 patients
+    if (previousEsi1Ids.value.size > 0) { // Don't alert on initial load
+      const currentEsi1 = data.filter(p => p.status === 'waiting' && getEffectiveLevel(p) === 1)
+      for (const p of currentEsi1) {
+        if (!previousEsi1Ids.value.has(p.id)) {
+          criticalAlertPatient.value = p
+          setTimeout(() => { criticalAlertPatient.value = null }, 8000)
+          break // Just show one alert at a time
+        }
+      }
+    }
+    
+    // Update tracking set
+    const newSet = new Set()
+    data.filter(p => p.status === 'waiting' && getEffectiveLevel(p) === 1).forEach(p => newSet.add(p.id))
+    previousEsi1Ids.value = newSet
+    
+    patients.value = data
   } catch (e) {
     console.error('Failed to fetch patients:', e)
   } finally {

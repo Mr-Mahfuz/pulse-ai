@@ -15,7 +15,7 @@ SmartTriage is an AI-powered emergency department triage assistant that transfor
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    FRONTEND (Next.js + React)                │
+│                    FRONTEND (Nuxt + Vue)                     │
 │                                                              │
 │  ┌──────────────┐  ┌──────────────┐  ┌───────────────────┐  │
 │  │ Triage Queue  │  │Patient Detail│  │  AI Rationale     │  │
@@ -67,12 +67,12 @@ SmartTriage is an AI-powered emergency department triage assistant that transfor
 | Original Plan | Revised for 5 Hours | Why |
 |---|---|---|
 | PostgreSQL + pgvector | **SQLite** | Zero setup, portable, sufficient for prototype |
-| Redis + WebSockets | **REST + polling (3s interval)** | Same UX effect, 90% less setup time |
-| Bio_ClinicalBERT embeddings | **Keyword/rule-based NLP + LLM extraction** | BERT setup/download eats too much time; Gemini API handles NLP well enough |
+| Redis + WebSockets | **REST + polling (10s interval)** | Same UX effect, 90% less setup time |
+| Bio_ClinicalBERT embeddings | **Keyword/rule-based NLP + Gemini extraction** | BERT setup/download eats too much time; Gemini API handles NLP well enough |
 | Train XGBoost from scratch | **Pre-trained scikit-learn model on synthetic data** (train during Phase 1) | Still "our own model" for judges, but trainable in minutes |
 | Docker Compose | **Direct `npm run dev` + `uvicorn`** | No containers needed for demo day |
 | Keycloak/OIDC auth | **Simple role-based header (demo mode)** | Auth adds zero demo value in 5 hours |
-| Next.js + TypeScript | **Next.js + JavaScript** | Faster to write, no type errors to debug under pressure |
+| Next.js + TypeScript | **Nuxt + Vue** | Faster to write, no type errors to debug under pressure |
 
 ---
 

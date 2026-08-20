@@ -20,6 +20,16 @@
 
       <!-- ESI Badge + Actions -->
       <div class="flex items-center gap-3" v-if="patient && patient.triage_level">
+        <button v-if="patient.status === 'waiting'" @click="clearPatient" :disabled="clearing" class="btn-primary !bg-emerald-600 hover:!bg-emerald-700 !border-emerald-700 print:hidden mr-2">
+          <svg v-if="clearing" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+          <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          Clear Patient
+        </button>
+        <button v-else-if="patient.status === 'discharged'" @click="restorePatient" :disabled="clearing" class="btn-primary !bg-blue-600 hover:!bg-blue-700 !border-blue-700 print:hidden mr-2">
+          <svg v-if="clearing" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+          <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+          Restore Patient
+        </button>
         <button @click="printReport" class="btn-secondary print:hidden">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
           {{ $t('patient_detail.print') }}
@@ -93,9 +103,12 @@
             <div class="grid grid-cols-2 gap-3">
               <div v-for="(vital, key) in vitalFields" :key="key">
                 <div class="section-label mb-1">{{ vital.label }} <span class="text-gray-300 dark:text-gray-600">{{ vital.unit }}</span></div>
-                <input v-model.number="editableVitals[key]" type="number" :step="key === 'temperature' ? 0.1 : 1"
+                <input v-model.number="editableVitals[key]" type="number" :step="['temperature', 'weight'].includes(key) ? 0.1 : 1"
                        class="form-input font-mono text-sm !py-2"
                        :class="getVitalInputClass(key, editableVitals[key])" />
+                <div class="mt-2 opacity-60 hover:opacity-100 transition-opacity" v-if="getVitalHistory(key).length > 1">
+                  <VitalSparkline :data="getVitalHistory(key)" :color="getSparklineColor(key)" />
+                </div>
               </div>
             </div>
           </div>
@@ -158,8 +171,17 @@
 
             <!-- Rationale -->
             <div v-if="patient.triage_rationale" class="pt-4 border-t border-gray-100 dark:border-gray-800">
-              <div class="section-label mb-2">{{ $t('patient_detail.clinical_rationale') }}</div>
-              <div class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-800 italic">
+              <div class="flex items-center justify-between mb-2">
+                <div class="section-label">{{ $t('patient_detail.clinical_rationale') }}</div>
+                <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-0.5 rounded-lg print:hidden">
+                  <button @click="translate('en')" :class="activeLang === 'en' ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all">EN</button>
+                  <button @click="translate('bn')" :class="activeLang === 'bn' ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all">BN</button>
+                </div>
+              </div>
+              <div class="relative text-sm text-gray-600 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-800 italic transition-colors">
+                <div v-if="translating" class="absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center backdrop-blur-[1px] rounded-xl z-10">
+                  <svg class="animate-spin h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                </div>
                 "{{ patient.triage_rationale }}"
               </div>
             </div>
@@ -239,15 +261,18 @@
 import { getEsiLevel, getEffectiveLevel, formatTimeAgo, formatTimestamp, getVitalStatus, VITAL_LABELS } from '~/utils/esi'
 
 const route = useRoute()
-const { getPatient, updatePatient, runTriage, getAuditLog } = useApi()
+const { getPatient, updatePatient, runTriage, getAuditLog, updatePatientStatus, translateRationale } = useApi()
 
 const patient = ref(null)
 const auditLogs = ref([])
 const loading = ref(true)
 const triaging = ref(false)
 const saving = ref(false)
+const clearing = ref(false)
 const showOverrideModal = ref(false)
 const editableVitals = ref({})
+const translating = ref(false)
+const activeLang = ref('en')
 
 const vitalFields = VITAL_LABELS
 
@@ -287,6 +312,46 @@ const onOverridden = async () => {
   await fetchPatient(); await fetchAudit()
 }
 
+const clearPatient = async () => {
+  if (!confirm('Are you sure you want to clear this patient from the triage queue?')) return
+  clearing.value = true
+  try {
+    await updatePatientStatus(route.params.id, 'discharged')
+    useRouter().push('/')
+  } catch (e) {
+    console.error('Failed to discharge patient', e)
+  } finally {
+    clearing.value = false
+  }
+}
+
+const restorePatient = async () => {
+  clearing.value = true
+  try {
+    await updatePatientStatus(route.params.id, 'waiting')
+    useRouter().push('/')
+  } catch (e) {
+    console.error('Failed to restore patient', e)
+  } finally {
+    clearing.value = false
+  }
+}
+
+const translate = async (lang) => {
+  if (lang === activeLang.value) return
+  translating.value = true
+  try {
+    const res = await translateRationale(route.params.id, lang)
+    patient.value.triage_rationale = res.rationale
+    activeLang.value = lang
+  } catch (e) {
+    console.error(e)
+    alert("Translation failed")
+  } finally {
+    translating.value = false
+  }
+}
+
 const getVitalInputClass = (name, value) => {
   const status = getVitalStatus(name, value)
   return {
@@ -294,6 +359,26 @@ const getVitalInputClass = (name, value) => {
     warning: '!border-amber-400 !text-amber-700 dark:!text-amber-400 !bg-amber-50 dark:!bg-amber-950/20',
     critical: '!border-red-400 !text-red-700 dark:!text-red-400 !bg-red-50 dark:!bg-red-950/20',
   }[status]
+}
+
+const getVitalHistory = (key) => {
+  if (!patient.value || patient.value[key] === null || patient.value[key] === undefined) return []
+  const history = []
+  history.unshift({ value: patient.value[key], time: new Date() })
+  for (const log of auditLogs.value) {
+    if (log.action === 'patient_updated' && log.old_value && log.old_value[key] !== undefined) {
+      history.unshift({ value: log.old_value[key], time: new Date(log.timestamp) })
+    }
+  }
+  return history
+}
+
+const getSparklineColor = (key) => {
+  if (!patient.value) return '#3B82F6'
+  const status = getVitalStatus(key, patient.value[key])
+  if (status === 'critical') return '#DC2626' // red-600
+  if (status === 'warning') return '#D97706' // amber-600
+  return '#3B82F6' // blue-500
 }
 
 const getAuditDotClass = (action) => ({

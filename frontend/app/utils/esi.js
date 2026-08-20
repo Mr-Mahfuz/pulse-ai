@@ -3,11 +3,11 @@
  */
 
 export const ESI_LEVELS = {
-  1: { name: 'Resuscitation', color: '#2563EB', bgClass: 'bg-blue-600', textClass: 'text-blue-600', badgeClass: 'esi-badge-1', borderClass: 'border-glow-1', icon: '🔵' },
-  2: { name: 'Emergent', color: '#DC2626', bgClass: 'bg-red-600', textClass: 'text-red-600', badgeClass: 'esi-badge-2', borderClass: 'border-glow-2', icon: '🔴' },
-  3: { name: 'Urgent', color: '#F97316', bgClass: 'bg-orange-500', textClass: 'text-orange-500', badgeClass: 'esi-badge-3', borderClass: 'border-glow-3', icon: '🟠' },
-  4: { name: 'Less Urgent', color: '#65A30D', bgClass: 'bg-lime-600', textClass: 'text-lime-600', badgeClass: 'esi-badge-4', borderClass: 'border-glow-4', icon: '🟢' },
-  5: { name: 'Non-Urgent', color: '#4B5563', bgClass: 'bg-gray-600', textClass: 'text-gray-600', badgeClass: 'esi-badge-5', borderClass: 'border-glow-5', icon: '⚫' },
+  1: { name: 'Resuscitation', color: '#DC2626', bgClass: 'bg-red-600', textClass: 'text-red-600', badgeClass: 'esi-badge-1', borderClass: 'border-glow-1', icon: '🔴' },
+  2: { name: 'Emergent', color: '#EA580C', bgClass: 'bg-orange-600', textClass: 'text-orange-600', badgeClass: 'esi-badge-2', borderClass: 'border-glow-2', icon: '🟠' },
+  3: { name: 'Urgent', color: '#EAB308', bgClass: 'bg-yellow-500', textClass: 'text-yellow-500', badgeClass: 'esi-badge-3', borderClass: 'border-glow-3', icon: '🟡' },
+  4: { name: 'Less Urgent', color: '#16A34A', bgClass: 'bg-green-600', textClass: 'text-green-600', badgeClass: 'esi-badge-4', borderClass: 'border-glow-4', icon: '🟢' },
+  5: { name: 'Non-Urgent', color: '#2563EB', bgClass: 'bg-blue-600', textClass: 'text-blue-600', badgeClass: 'esi-badge-5', borderClass: 'border-glow-5', icon: '🔵' },
 }
 
 export const getEsiLevel = (level) => ESI_LEVELS[level] || ESI_LEVELS[5]
@@ -47,6 +47,7 @@ export const getVitalStatus = (name, value) => {
     temperature: { critical: [0, 35, 39.5, 45], warning: [35, 36, 38, 39.5] },
     spo2: { critical: [0, 88, -1, -1], warning: [88, 94, -1, -1] },
     gcs_score: { critical: [0, 9, -1, -1], warning: [9, 13, -1, -1] },
+    pain_scale: { critical: [8, 10, -1, -1], warning: [5, 7, -1, -1] },
   }
 
   const range = ranges[name]
@@ -70,4 +71,6 @@ export const VITAL_LABELS = {
   temperature: { label: 'Temp', unit: '°C' },
   spo2: { label: 'SpO₂', unit: '%' },
   gcs_score: { label: 'GCS', unit: '/15' },
+  weight: { label: 'Weight', unit: 'kg' },
+  pain_scale: { label: 'Pain', unit: '/10' }
 }

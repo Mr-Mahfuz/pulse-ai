@@ -22,15 +22,15 @@ SmartTriage is a modern, decoupled web application.
 ### Tech Stack
 *   **Frontend:** Nuxt 3 (Vue.js), Tailwind CSS, Vue i18n.
 *   **Backend:** Python, FastAPI, SQLAlchemy (SQLite database).
-*   **AI Integration:** Google GenAI SDK (`gemini-2.5-flash` / `gemini-3.6-flash`).
+*   **AI Integration:** Google GenAI SDK (`gemini-2.5-flash`).
 
 ### Core AI Pipelines
 1.  **Speech-to-JSON Pipeline (`speech.py`):**
     *   Captures continuous Web Speech API transcripts.
     *   Uses Gemini with a **Strict JSON Schema (`response_schema`)** to mathematically guarantee the unstructured voice text is parsed into a valid Pydantic model (`PatientCreate`).
-2.  **Triage Assessment Pipeline (`ml_model.py`):**
-    *   Evaluates vitals against hardcoded physiological thresholds (e.g., SpO2 < 90% = Level 1).
-    *   Checks chief complaints against high-risk keywords.
+2.  **Triage Assessment Pipeline:**
+    *   **Red-Flag Engine (`triage_engine.py`):** Evaluates vitals and symptoms against hardcoded physiological thresholds (e.g., SpO2 < 85% = Level 1).
+    *   **ML Classifier (`ml_model.py`):** A Random Forest model that predicts the baseline ESI level and probabilities based on 24 features.
 3.  **Rationale Generation Pipeline (`llm_explainer.py`):**
     *   Feeds the computed triage level, patient data, and triggered red flags back into Gemini.
     *   Prompts Gemini with standard ESI guidelines to generate a 2-3 sentence clinical explanation for the clinician.

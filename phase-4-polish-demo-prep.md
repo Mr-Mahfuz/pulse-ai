@@ -73,7 +73,7 @@ Required by rules: *"Teams must disclose any AI tools, APIs, datasets, or extern
 
 ### Libraries & Frameworks
 - FastAPI, scikit-learn, SQLAlchemy (Python backend)
-- Next.js, React, Tailwind CSS, shadcn/ui (frontend)
+- Nuxt, Vue, Tailwind CSS (frontend)
 - SQLite (database)
 ```
 

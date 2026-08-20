@@ -7,7 +7,7 @@
 
 ## Pre-Hackathon Prep (During 3-Day Window)
 
-- [x] Next.js project scaffolded with Tailwind + shadcn/ui
+- [x] Nuxt project scaffolded with Tailwind
 - [x] Design system tokens defined (colors, typography, spacing)
 - [x] Component shells created (structure without business logic)
 - [x] API client utility (`lib/api.js`) written
@@ -45,7 +45,7 @@ The hero screen. A real-time, color-coded patient queue sorted by priority.
 **Layout:**
 ```
 ┌────────────────────────────────────────────────────────┐
-│  🏥 SmartTriage    [Add Patient]    ⏱ Live   🔄 3s    │
+│  🏥 SmartTriage    [Add Patient]    ⏱ Live   🔄 10s   │
 ├────────────────────────────────────────────────────────┤
 │  Summary Stats Bar                                     │
 │  [🔴 2 Critical] [🟠 5 Emergent] [🟡 12 Urgent] ...  │
@@ -159,14 +159,14 @@ When clinician clicks "Override":
 
 ## Verify Phase 3
 
-- [ ] Queue displays all patients sorted by priority
-- [ ] Queue auto-refreshes (new patients appear without reload)
-- [ ] Patient detail shows all vitals, triage result, rationale, and audit log
-- [ ] Editing vitals + re-running triage updates everything live
-- [ ] Add Patient form works end-to-end
-- [ ] Override flow works with audit logging
-- [ ] No visual glitches, smooth animations
-- [ ] Dark theme renders correctly
+- [x] Queue displays all patients sorted by priority
+- [x] Queue auto-refreshes (new patients appear without reload)
+- [x] Patient detail shows all vitals, triage result, rationale, and audit log
+- [x] Editing vitals + re-running triage updates everything live
+- [x] Add Patient form works end-to-end
+- [x] Override flow works with audit logging
+- [x] No visual glitches, smooth animations
+- [x] Dark theme renders correctly
 
 ---
 

@@ -17,6 +17,8 @@ class PatientCreate(BaseModel):
     temperature: Optional[float] = Field(None, ge=25.0, le=45.0)
     spo2: Optional[int] = Field(None, ge=0, le=100)
     gcs_score: Optional[int] = Field(15, ge=3, le=15)
+    weight: Optional[float] = Field(None, ge=0.0, le=500.0)
+    pain_scale: Optional[int] = Field(None, ge=0, le=10)
     medical_history: str = ""
 
 
@@ -32,6 +34,8 @@ class PatientUpdate(BaseModel):
     temperature: Optional[float] = Field(None, ge=25.0, le=45.0)
     spo2: Optional[int] = Field(None, ge=0, le=100)
     gcs_score: Optional[int] = Field(None, ge=3, le=15)
+    weight: Optional[float] = Field(None, ge=0.0, le=500.0)
+    pain_scale: Optional[int] = Field(None, ge=0, le=10)
     medical_history: Optional[str] = None
     status: Optional[str] = None
 
@@ -49,6 +53,8 @@ class PatientResponse(BaseModel):
     temperature: Optional[float]
     spo2: Optional[int]
     gcs_score: Optional[int]
+    weight: Optional[float]
+    pain_scale: Optional[int]
     medical_history: str
     arrival_time: Optional[datetime]
     triage_level: Optional[int]

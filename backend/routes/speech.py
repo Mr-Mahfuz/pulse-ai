@@ -2,9 +2,13 @@ import os
 import json
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from google import genai
-from google.genai import types
 from backend.models import PatientCreate
+try:
+    from google import genai
+    from google.genai import types
+    GENAI_AVAILABLE = True
+except ImportError:
+    GENAI_AVAILABLE = False
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -32,6 +36,8 @@ Extract the following fields and format exactly as JSON matching this schema:
 - temperature (float or null)
 - spo2 (integer or null)
 - gcs_score (integer or null, default 15)
+- weight (float or null)
+- pain_scale (integer or null, 1-10)
 - medical_history (string, translated to English if the input was Bengali. AGGRESSIVELY extract any mention of chronic conditions, past surgeries, comorbidities, or risk factors here (e.g., "diabetic", "history of bypass", "hypertension").)
 
 If a value is not mentioned in the transcript, set it to null (or empty string for strings).
@@ -41,8 +47,11 @@ If a blood pressure is given like "120 over 80", map 120 to systolic_bp and 80 t
 
 Respond ONLY with valid JSON. Do not include markdown blocks like ```json."""
 
-@router.post("/parse-speech", response_model=PatientCreate)
+@router.post("/parse-speech")
 async def parse_speech(request: SpeechRequest):
+    if not GENAI_AVAILABLE:
+        raise HTTPException(status_code=503, detail="Gemini SDK not installed. Please install google-genai.")
+        
     keys_str = os.getenv("GEMINI_API_KEYS") or os.getenv("GEMINI_API_KEY")
     api_keys = [k.strip() for k in keys_str.split(',')] if keys_str else []
     
@@ -81,9 +90,10 @@ async def parse_speech(request: SpeechRequest):
                             "temperature": {"type": "number"},
                             "spo2": {"type": "integer"},
                             "gcs_score": {"type": "integer"},
+                            "weight": {"type": "number"},
+                            "pain_scale": {"type": "integer"},
                             "medical_history": {"type": "string"}
-                        },
-                        "required": ["name", "age", "gender", "chief_complaint"]
+                        }
                     }
                 )
             )
@@ -92,15 +102,6 @@ async def parse_speech(request: SpeechRequest):
                 raise HTTPException(status_code=500, detail="Empty response from LLM")
                 
             parsed_data = json.loads(response.text)
-            
-            # Ensure fallback values for required fields
-            if not parsed_data.get("name"):
-                parsed_data["name"] = "Unknown Patient"
-            if not parsed_data.get("age"):
-                parsed_data["age"] = 30
-            if not parsed_data.get("gender"):
-                parsed_data["gender"] = "Other"
-                
             return parsed_data
 
         except json.JSONDecodeError as e:

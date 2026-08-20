@@ -42,7 +42,7 @@ google-generativeai>=0.8.0
 python-dotenv>=1.0
 ```
 
-### 1.2 — Initialize Frontend (Next.js + React)
+### 1.2 — Initialize Frontend (Nuxt + Vue)
 
 ```
 smarttriage/
@@ -68,7 +68,7 @@ smarttriage/
 │   └── public/
 ```
 
-**Dependencies**: Next.js (React), shadcn/ui primitives, Tailwind CSS
+**Dependencies**: Nuxt (Vue), Tailwind CSS
 
 ### 1.3 — Define Data Model
 
@@ -187,7 +187,7 @@ Get audit log for a patient.
 ## 🔴 USER ACTION REQUIRED
 
 1. **Python virtual environment**: I'll create this for you, but confirm you have Python 3.10+ installed.
-2. **Node.js**: Confirm you have Node.js 18+ installed (needed for Next.js).
+2. **Node.js**: Confirm you have Node.js 18+ installed (needed for Nuxt).
 3. **Google Gemini API Key**: You'll need a free API key from [Google AI Studio](https://aistudio.google.com/apikey).
    - Go to the link → Click "Create API Key" → Copy it
    - You'll set it as `GEMINI_API_KEY` in a `.env` file (I'll tell you exactly when and where)

@@ -143,7 +143,7 @@ def run_simulation(interval_seconds=15):
         
         try:
             response = requests.post(API_URL, json=patient)
-            if response.status_code == 200:
+            if response.status_code in (200, 201):
                 print(f"    ✅ Successfully added to queue!")
             else:
                 print(f"    ❌ API Error: {response.status_code}")

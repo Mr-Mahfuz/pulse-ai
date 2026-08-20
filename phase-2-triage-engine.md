@@ -175,12 +175,12 @@ GET  /api/triage/{patient_id}/history   → Get triage history for patient
 
 ### 2.6 — Verify Phase 2
 
-- [ ] Red-flag rules correctly catch critical cases (test with edge cases)
-- [ ] ML model returns level + confidence for any valid input
-- [ ] LLM explanation generates readable rationale in <3 seconds
-- [ ] Fallback explanation works when LLM is unavailable
-- [ ] Changing vitals via PUT → re-triage → produces updated result
-- [ ] Audit log captures every triage computation
+- [x] Red-flag rules correctly catch critical cases (test with edge cases)
+- [x] ML model returns level + confidence for any valid input
+- [x] LLM explanation generates readable rationale in <3 seconds
+- [x] Fallback explanation works when LLM is unavailable
+- [x] Changing vitals via PUT → re-triage → produces updated result
+- [x] Audit log captures every triage computation
 
 ---
 
