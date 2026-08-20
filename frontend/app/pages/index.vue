@@ -120,7 +120,7 @@
 
       <!-- Table -->
       <div v-if="!mciMode" class="overflow-x-auto min-h-[400px] pb-4">
-        <table class="w-full text-left border-collapse table-fixed min-w-[1000px]">
+        <table class="w-full text-left border-collapse table-fixed">
           <thead>
             <tr class="border-b border-gray-100 dark:border-gray-800 text-[10px] font-bold text-gray-400 dark:text-gray-500 tracking-wider uppercase">
               <th class="px-4 py-3 font-semibold w-[13%]">{{ $t('dashboard.priority') }}</th>
@@ -129,7 +129,7 @@
               <th class="px-4 py-3 font-semibold w-[18%]">{{ $t('dashboard.patient') }}</th>
               <th class="px-4 py-3 font-semibold w-[26%]">{{ $t('dashboard.complaint') }}</th>
               <th class="px-4 py-3 font-semibold w-[15%]">{{ $t('dashboard.vitals') }}</th>
-              <th class="px-4 py-3 font-semibold text-right pr-6 w-[12%]">{{ $t('dashboard.ai_conf') }}</th>
+              <th class="px-4 py-3 font-semibold text-right w-[12%]">{{ $t('dashboard.ai_conf') }}</th>
             </tr>
           </thead>
           <!-- Loading -->
@@ -182,7 +182,7 @@
                 <div class="text-xs text-gray-500 mt-0.5">{{ patient.age }}y · {{ patient.gender }}</div>
               </td>
               <!-- Complaint -->
-              <td class="px-4 py-4 pr-6 truncate">
+              <td class="px-4 py-4 truncate">
                 <p class="text-gray-600 dark:text-gray-300 truncate text-xs" :title="patient.chief_complaint">{{ patient.chief_complaint }}</p>
                 <div v-if="patient.triage_source === 'red_flag_override'" class="mt-1 flex">
                   <span class="text-[8px] px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/40 font-bold tracking-wider uppercase">🚩 {{ $t('dashboard.red_flag') }}</span>
@@ -210,7 +210,7 @@
                 </div>
               </td>
               <!-- Confidence -->
-              <td class="text-right">
+              <td class="text-right px-4 py-4">
                 <div v-if="patient.triage_source === 'red_flag_override'" class="flex items-center justify-end">
                   <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider">
                     Safety Rule
