@@ -27,7 +27,10 @@
              class="bg-red-900/30 border-2 border-red-500/50 rounded-2xl p-6 flex items-center justify-between shadow-[0_0_30px_rgba(220,38,38,0.2)]">
           <div>
             <div class="text-3xl font-black text-white mb-2">{{ maskName(patient.name) }}</div>
-            <div class="text-lg text-red-200">{{ patient.age }}y • {{ patient.gender }}</div>
+            <div class="text-lg text-red-200">
+              <span class="font-mono bg-red-950/50 px-2 py-0.5 rounded border border-red-800/50 mr-2">PT-{{ String(patient.id).padStart(3, '0') }}</span>
+              {{ patient.age }}y • {{ patient.gender }}
+            </div>
           </div>
           <div class="text-center bg-red-600 px-6 py-3 rounded-xl font-black text-2xl uppercase tracking-wider animate-pulse">
             Triage Desk A
@@ -62,8 +65,13 @@
           
           <!-- Patient -->
           <div class="col-span-4">
-            <div class="text-2xl font-bold text-white">{{ maskName(patient.name) }}</div>
-            <div class="text-gray-400">{{ patient.age }}y</div>
+            <div class="text-2xl font-bold text-white flex items-center gap-3">
+              {{ maskName(patient.name) }}
+            </div>
+            <div class="text-gray-400 flex items-center gap-2 mt-1">
+              <span class="font-mono text-xs bg-gray-800 px-1.5 py-0.5 rounded text-gray-300 border border-gray-700">PT-{{ String(patient.id).padStart(3, '0') }}</span>
+              <span>{{ patient.age }}y</span>
+            </div>
           </div>
           
           <!-- Symptoms -->
