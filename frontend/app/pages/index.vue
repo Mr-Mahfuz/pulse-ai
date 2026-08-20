@@ -258,65 +258,71 @@
     </div>
 
     <!-- Modal -->
-    <PatientFormModal v-if="showAddModal" @close="showAddModal = false" @created="onPatientCreated" />
+    <Teleport to="body">
+      <PatientFormModal v-if="showAddModal" @close="showAddModal = false" @created="onPatientCreated" />
+    </Teleport>
 
     <!-- Enrolling Spinner -->
-    <div v-if="isEnrolling" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
-      <div class="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4 border border-gray-200 dark:border-gray-800 animate-slide-up">
-        <svg class="animate-spin h-10 w-10 text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-        <div class="text-center">
-          <h2 class="text-lg font-bold text-gray-900 dark:text-white">Enrolling Patient...</h2>
-          <p class="text-sm text-gray-500 mt-1">Running AI Triage Assessment</p>
+    <Teleport to="body">
+      <div v-if="isEnrolling" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4 border border-gray-200 dark:border-gray-800 animate-slide-up">
+          <svg class="animate-spin h-10 w-10 text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+          <div class="text-center">
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white">Enrolling Patient...</h2>
+            <p class="text-sm text-gray-500 mt-1">Running AI Triage Assessment</p>
+          </div>
         </div>
       </div>
-    </div>
+    </Teleport>
 
     <!-- Analytics Modal -->
-    <div v-if="showAnalyticsModal" class="fixed inset-0 z-50 flex items-center justify-center animate-fade-in" @click.self="showAnalyticsModal = false">
-      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
-      <div class="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-6 border border-gray-200 dark:border-gray-800 animate-slide-up">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            System & Token Analytics
-          </h2>
-          <button @click="showAnalyticsModal = false" class="btn-ghost !p-2 !rounded-full">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-          </button>
-        </div>
+    <Teleport to="body">
+      <div v-if="showAnalyticsModal" class="fixed inset-0 z-[60] flex items-center justify-center animate-fade-in" @click.self="showAnalyticsModal = false">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+        <div class="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-6 border border-gray-200 dark:border-gray-800 animate-slide-up">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              System & Token Analytics
+            </h2>
+            <button @click="showAnalyticsModal = false" class="btn-ghost !p-2 !rounded-full">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
 
-        <div class="grid grid-cols-2 gap-4 mb-6">
-          <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
-            <div class="text-[10px] font-bold text-blue-500 tracking-wider uppercase mb-1">Total Triages</div>
-            <div class="text-3xl font-black text-blue-700 dark:text-blue-400">{{ patients.length }}</div>
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
+              <div class="text-[10px] font-bold text-blue-500 tracking-wider uppercase mb-1">Total Triages</div>
+              <div class="text-3xl font-black text-blue-700 dark:text-blue-400">{{ patients.length }}</div>
+            </div>
+            <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
+              <div class="text-[10px] font-bold text-emerald-500 tracking-wider uppercase mb-1">Rules Bypasses</div>
+              <div class="text-3xl font-black text-emerald-700 dark:text-emerald-400">{{ rulesBypasses }}</div>
+              <div class="text-[9px] text-emerald-600 mt-1">Saved {{ rulesBypasses * 350 }} LLM Tokens</div>
+            </div>
           </div>
-          <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
-            <div class="text-[10px] font-bold text-emerald-500 tracking-wider uppercase mb-1">Rules Bypasses</div>
-            <div class="text-3xl font-black text-emerald-700 dark:text-emerald-400">{{ rulesBypasses }}</div>
-            <div class="text-[9px] text-emerald-600 mt-1">Saved {{ rulesBypasses * 350 }} LLM Tokens</div>
-          </div>
-        </div>
 
-        <div class="space-y-3">
-          <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-            <span class="text-sm font-semibold text-gray-600 dark:text-gray-300">Total LLM Tokens Used</span>
-            <span class="font-mono font-bold text-gray-900 dark:text-white">{{ (patients.length - rulesBypasses) * 350 }}</span>
-          </div>
-          <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-            <span class="text-sm font-semibold text-gray-600 dark:text-gray-300">Estimated API Cost</span>
-            <span class="font-mono font-bold text-gray-900 dark:text-white">${{ (((patients.length - rulesBypasses) * 350) / 1000000 * 0.075).toFixed(4) }}</span>
-          </div>
-          <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-            <span class="text-sm font-semibold text-gray-600 dark:text-gray-300">Avg. Latency (Rules)</span>
-            <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400">&lt; 5ms</span>
-          </div>
-          <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-            <span class="text-sm font-semibold text-gray-600 dark:text-gray-300">Avg. Latency (LLM)</span>
-            <span class="font-mono font-bold text-blue-600 dark:text-blue-400">~ 850ms</span>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+              <span class="text-sm font-semibold text-gray-600 dark:text-gray-300">Total LLM Tokens Used</span>
+              <span class="font-mono font-bold text-gray-900 dark:text-white">{{ (patients.length - rulesBypasses) * 350 }}</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+              <span class="text-sm font-semibold text-gray-600 dark:text-gray-300">Estimated API Cost</span>
+              <span class="font-mono font-bold text-gray-900 dark:text-white">${{ (((patients.length - rulesBypasses) * 350) / 1000000 * 0.075).toFixed(4) }}</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+              <span class="text-sm font-semibold text-gray-600 dark:text-gray-300">Avg. Latency (Rules)</span>
+              <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400">&lt; 5ms</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+              <span class="text-sm font-semibold text-gray-600 dark:text-gray-300">Avg. Latency (LLM)</span>
+              <span class="font-mono font-bold text-blue-600 dark:text-blue-400">~ 850ms</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Teleport>
   </div>
 </template>
 
