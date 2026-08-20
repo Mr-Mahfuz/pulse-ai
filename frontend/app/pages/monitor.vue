@@ -28,7 +28,7 @@
           <div>
             <div class="text-3xl font-black text-white mb-2">{{ maskName(patient.name) }}</div>
             <div class="text-lg text-red-200">
-              <span class="font-mono bg-red-950/50 px-2 py-0.5 rounded border border-red-800/50 mr-2">PT-{{ String(patient.id).padStart(3, '0') }}</span>
+              <span class="font-mono bg-red-950/50 px-2 py-0.5 rounded border border-red-800/50 mr-2">PT-{{ getShortId(patient.id) }}</span>
               {{ patient.age }}y • {{ patient.gender }}
             </div>
           </div>
@@ -69,7 +69,7 @@
               {{ maskName(patient.name) }}
             </div>
             <div class="text-gray-400 flex items-center gap-2 mt-1">
-              <span class="font-mono text-xs bg-gray-800 px-1.5 py-0.5 rounded text-gray-300 border border-gray-700">PT-{{ String(patient.id).padStart(3, '0') }}</span>
+              <span class="font-mono text-xs bg-gray-800 px-1.5 py-0.5 rounded text-gray-300 border border-gray-700">PT-{{ getShortId(patient.id) }}</span>
               <span>{{ patient.age }}y</span>
             </div>
           </div>
@@ -107,6 +107,14 @@ const maskName = (name) => {
   if (!name) return name
   const parts = name.split(' ')
   return parts.map(p => p.charAt(0) + '*'.repeat(Math.max(1, p.length - 1))).join(' ')
+}
+
+// Generate a stable 3-digit integer from the UUID
+const getShortId = (id) => {
+  if (!id) return '000'
+  // Take first 4 chars of UUID, parse as hex, modulo 1000
+  const intVal = parseInt(id.substring(0, 4), 16) % 1000
+  return String(intVal).padStart(3, '0')
 }
 
 const patients = ref([])
