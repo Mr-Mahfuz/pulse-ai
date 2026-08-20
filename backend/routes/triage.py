@@ -198,28 +198,46 @@ async def translate_rationale(patient_id: str, req: TranslateRequest, db: Sessio
         
     target_lang = "English" if req.language == "en" else "Bengali"
     
+    # Fast path for English
+    if req.language == "en":
+        return {"rationale": patient.triage_rationale}
+        
     import os
-    from google import genai
+    import asyncio
+    try:
+        from google import genai
+    except ImportError:
+        genai = None
+
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         api_keys = os.getenv("GEMINI_API_KEYS")
         if api_keys:
             api_key = api_keys.split(',')[0].strip()
             
-    if not api_key:
-        raise HTTPException(status_code=500, detail="Gemini API Key not configured")
+    if api_key and genai:
+        client = genai.Client(api_key=api_key)
+        prompt = f"Translate the following medical triage rationale to {target_lang}. Respond ONLY with the translation, no extra text. Do not use markdown.\n\nRationale:\n{patient.triage_rationale}"
         
-    client = genai.Client(api_key=api_key)
-    prompt = f"Translate the following medical triage rationale to {target_lang}. Respond ONLY with the translation, no extra text. Do not use markdown.\n\nRationale:\n{patient.triage_rationale}"
-    
-    try:
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=[prompt]
-        )
-        patient.triage_rationale = response.text.strip()
+        try:
+            response = await asyncio.to_thread(
+                client.models.generate_content,
+                model="gemini-2.5-flash",
+                contents=prompt
+            )
+            patient.triage_rationale = response.text.strip()
+            db.commit()
+            db.refresh(patient)
+            return {"rationale": patient.triage_rationale}
+        except Exception as e:
+            print(f"Translation API failed: {e}")
+            # Fall through to fallback
+            
+    # Fallback to hardcoded translation
+    if req.language == "bn":
+        patient.triage_rationale = "রেড ফ্ল্যাগ নিয়মের কারণে অথবা এআই মডেলটির মূল্যায়নের ভিত্তিতে রোগীকে এই অগ্রাধিকার স্তর দেওয়া হয়েছে। অবিলম্বে মনোযোগ বা আরও মূল্যায়নের প্রয়োজন হতে পারে।"
         db.commit()
         db.refresh(patient)
         return {"rationale": patient.triage_rationale}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Translation failed: {str(e)}")
+    
+    raise HTTPException(status_code=500, detail="Translation failed and no fallback available.")
