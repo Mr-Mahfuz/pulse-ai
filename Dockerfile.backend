@@ -1,0 +1,12 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY backend/ .
+
+# Ensure DB path works by copying it if needed or relying on the mount.
+# Default to running the fastapi server
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

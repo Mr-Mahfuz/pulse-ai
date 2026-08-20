@@ -86,7 +86,14 @@
 
         <!-- Vitals -->
         <div>
-          <div class="section-label mb-3">{{ $t('patient_modal.vitals') }} <span class="text-gray-300 dark:text-gray-600 normal-case tracking-normal">{{ $t('patient_modal.optional') }}</span></div>
+          <div class="flex items-center justify-between mb-3">
+            <div class="section-label">{{ $t('patient_modal.vitals') }} <span class="text-gray-300 dark:text-gray-600 normal-case tracking-normal">{{ $t('patient_modal.optional') }}</span></div>
+            <button type="button" @click="simulateIoT" class="flex items-center gap-2 px-3 py-1 text-[10px] font-bold rounded-lg border transition-all"
+                    :class="iotActive ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'bg-gray-50 dark:bg-gray-800 text-gray-500 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-750'">
+              <span class="w-1.5 h-1.5 rounded-full" :class="iotActive ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'"></span>
+              {{ iotActive ? 'SYNCING SENSOR...' : 'CONNECT OXIMETER' }}
+            </button>
+          </div>
           <div class="grid grid-cols-4 gap-3">
             <div v-for="(config, key) in vitalConfig" :key="key">
               <label class="form-label !text-xs">{{ config.label }}</label>
@@ -142,6 +149,26 @@ const form = ref({
 })
 
 const loading = ref(false)
+const iotActive = ref(false)
+
+const simulateIoT = () => {
+  if (iotActive.value) return
+  iotActive.value = true
+  
+  let cycles = 0
+  const interval = setInterval(() => {
+    form.value.heart_rate = Math.floor(Math.random() * (120 - 95 + 1) + 95)
+    form.value.spo2 = Math.floor(Math.random() * (99 - 92 + 1) + 92)
+    cycles++
+    
+    if (cycles > 15) {
+      clearInterval(interval)
+      iotActive.value = false
+      form.value.heart_rate = 104
+      form.value.spo2 = 96
+    }
+  }, 200)
+}
 
 // --- Speech Recognition Logic ---
 const isListening = ref(false)

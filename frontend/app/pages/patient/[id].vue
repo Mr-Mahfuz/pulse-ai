@@ -7,11 +7,11 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </NuxtLink>
         <div v-if="patient">
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{{ patient.name }}</h1>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{{ maskName(patient.name) }}</h1>
           <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             <span>{{ patient.age }}y · {{ patient.gender === 'M' ? 'Male' : patient.gender === 'F' ? 'Female' : patient.gender }}</span>
             <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
-            <span class="font-mono text-xs">MRN: {{ patient.id.split('-')[0].toUpperCase() }}</span>
+            <span class="font-mono text-xs">MRN: {{ maskMRN(patient.id) }}</span>
             <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
             <span>{{ formatTimeAgo(patient.arrival_time) }}</span>
           </div>
@@ -262,9 +262,11 @@
 
 <script setup>
 import { getEsiLevel, getEffectiveLevel, formatTimeAgo, formatTimestamp, getVitalStatus, VITAL_LABELS } from '~/utils/esi'
+import { usePrivacy } from '~/composables/usePrivacy'
 
 const route = useRoute()
 const { getPatient, updatePatient, runTriage, getAuditLog, updatePatientStatus, translateRationale } = useApi()
+const { maskName, maskMRN } = usePrivacy()
 
 const patient = ref(null)
 const auditLogs = ref([])

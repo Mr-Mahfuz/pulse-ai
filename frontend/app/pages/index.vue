@@ -35,8 +35,16 @@
                 :class="mciMode ? 'bg-red-600 text-white border-red-700 animate-pulse' : 'bg-white dark:bg-gray-800 text-red-500 border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/30'">
           {{ $t('dashboard.mci_mode') }}
         </button>
+        <!-- Privacy Toggle -->
+        <button @click="privacyMode = !privacyMode" class="btn-ghost !p-2" :class="privacyMode ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/30' : ''" :title="privacyMode ? 'Disable Privacy Mode' : 'Enable Privacy Mode'">
+          <svg v-if="privacyMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+        </button>
         <button @click="fetchPatients" class="btn-ghost !p-2" title="Refresh">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        </button>
+        <button @click="showAnalyticsModal = true" class="btn-ghost !p-2" title="System Analytics">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
         </button>
         <button @click="showAddModal = true" class="btn-primary">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
@@ -170,7 +178,7 @@
               </td>
               <!-- Patient -->
               <td class="px-4 py-4">
-                <div class="font-semibold text-gray-900 dark:text-white text-sm">{{ patient.name }}</div>
+                <div class="font-semibold text-gray-900 dark:text-white text-sm">{{ maskName(patient.name) }}</div>
                 <div class="text-xs text-gray-500 mt-0.5">{{ patient.age }}y · {{ patient.gender }}</div>
               </td>
               <!-- Complaint -->
@@ -234,7 +242,7 @@
             {{ getMciColor(getEffectiveLevel(patient)).label }}
           </div>
           <div class="p-6 bg-white dark:bg-gray-900 flex-1 flex flex-col">
-            <h3 class="font-bold text-2xl mb-1 text-gray-900 dark:text-white">{{ patient.name }}</h3>
+            <h3 class="font-bold text-2xl mb-1 text-gray-900 dark:text-white">{{ maskName(patient.name) }}</h3>
             <div class="text-sm text-gray-500 mb-4">{{ patient.age }}y • {{ patient.gender }}</div>
             <p class="text-gray-700 dark:text-gray-300 font-medium mb-6 line-clamp-3 flex-1">
               "{{ patient.chief_complaint }}"
@@ -262,17 +270,67 @@
         </div>
       </div>
     </div>
+
+    <!-- Analytics Modal -->
+    <div v-if="showAnalyticsModal" class="fixed inset-0 z-50 flex items-center justify-center animate-fade-in" @click.self="showAnalyticsModal = false">
+      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+      <div class="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-6 border border-gray-200 dark:border-gray-800 animate-slide-up">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            System & Token Analytics
+          </h2>
+          <button @click="showAnalyticsModal = false" class="btn-ghost !p-2 !rounded-full">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
+            <div class="text-[10px] font-bold text-blue-500 tracking-wider uppercase mb-1">Total Triages</div>
+            <div class="text-3xl font-black text-blue-700 dark:text-blue-400">{{ patients.length }}</div>
+          </div>
+          <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
+            <div class="text-[10px] font-bold text-emerald-500 tracking-wider uppercase mb-1">Rules Bypasses</div>
+            <div class="text-3xl font-black text-emerald-700 dark:text-emerald-400">{{ rulesBypasses }}</div>
+            <div class="text-[9px] text-emerald-600 mt-1">Saved {{ rulesBypasses * 350 }} LLM Tokens</div>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+            <span class="text-sm font-semibold text-gray-600 dark:text-gray-300">Total LLM Tokens Used</span>
+            <span class="font-mono font-bold text-gray-900 dark:text-white">{{ (patients.length - rulesBypasses) * 350 }}</span>
+          </div>
+          <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+            <span class="text-sm font-semibold text-gray-600 dark:text-gray-300">Estimated API Cost</span>
+            <span class="font-mono font-bold text-gray-900 dark:text-white">${{ (((patients.length - rulesBypasses) * 350) / 1000000 * 0.075).toFixed(4) }}</span>
+          </div>
+          <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+            <span class="text-sm font-semibold text-gray-600 dark:text-gray-300">Avg. Latency (Rules)</span>
+            <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400">&lt; 5ms</span>
+          </div>
+          <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+            <span class="text-sm font-semibold text-gray-600 dark:text-gray-300">Avg. Latency (LLM)</span>
+            <span class="font-mono font-bold text-blue-600 dark:text-blue-400">~ 850ms</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { getEsiLevel, getEffectiveLevel } from '~/utils/esi'
+import { usePrivacy } from '~/composables/usePrivacy'
 
 const { getPatients, runTriage } = useApi()
+const { privacyMode, maskName } = usePrivacy()
 
 const patients = ref([])
 const loading = ref(true)
 const showAddModal = ref(false)
+const showAnalyticsModal = ref(false)
 const isEnrolling = ref(false)
 const searchQuery = ref('')
 const mciMode = ref(false)
@@ -282,6 +340,7 @@ const previousEsi1Ids = ref(new Set())
 const criticalAlertPatient = ref(null)
 
 const activePatients = computed(() => patients.value.filter(p => p.status === 'waiting'))
+const rulesBypasses = computed(() => patients.value.filter(p => p.triage_source === 'rules_engine' || p.triage_source === 'red_flag_override').length)
 
 const esiCounts = computed(() => {
   const counts = {}
