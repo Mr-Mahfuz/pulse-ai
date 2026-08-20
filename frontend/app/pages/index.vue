@@ -339,7 +339,7 @@ const showAddModal = ref(false)
 const showAnalyticsModal = ref(false)
 const isEnrolling = ref(false)
 const searchQuery = ref('')
-const mciMode = ref(false)
+const mciMode = useState('mciMode', () => false)
 const activeTab = ref('main') // 'main' or 'fast'
 let refreshInterval = null
 const previousEsi1Ids = ref(new Set())
@@ -428,9 +428,11 @@ const filteredPatients = computed(() => {
 // Completely sort patients: SLA Breached first, then ESI Level, then Time
 const sortedPatients = computed(() => {
   return [...filteredPatients.value].sort((a, b) => {
-    const slaA = isSlaBreached(a) ? -1 : 1
-    const slaB = isSlaBreached(b) ? -1 : 1
-    if (slaA !== slaB) return slaA - slaB // SLA breaches float to top
+    if (!mciMode.value) {
+      const slaA = isSlaBreached(a) ? -1 : 1
+      const slaB = isSlaBreached(b) ? -1 : 1
+      if (slaA !== slaB) return slaA - slaB // SLA breaches float to top in normal mode
+    }
     
     const levelA = getEffectiveLevel(a) || 99
     const levelB = getEffectiveLevel(b) || 99
